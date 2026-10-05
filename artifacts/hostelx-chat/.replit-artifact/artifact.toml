@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "HostelX Chat"
+description = "A private group chat app for hostel residents, with account setup, group conversations, messaging, and video-call controls."
+version = "1.0.0"
+id = "artifacts/hostelx-chat"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23309
+
+[services.development]
+run = "pnpm --filter @workspace/hostelx-chat run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/hostelx-chat", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/hostelx-chat/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23309"
+BASE_PATH = "/"
