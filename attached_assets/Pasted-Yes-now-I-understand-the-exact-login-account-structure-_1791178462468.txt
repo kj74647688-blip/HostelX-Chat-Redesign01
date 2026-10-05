@@ -1,0 +1,317 @@
+Yes, now I understand the **exact login/account structure** you want. You want a fixed set of 50 accounts, where the first account belongs to Kartik/Admin, and after the first successful login each user creates their own display name that becomes their identity inside the app.
+
+Here is the corrected requirement you can add to your main prompt:
+
+```text
+USER ACCOUNT AND LOGIN SYSTEM
+
+Create exactly 50 predefined user accounts.
+
+The accounts must be:
+
+user1.hostelx.in
+user2.hostelx.in
+user3.hostelx.in
+...
+user50.hostelx.in
+
+These are the initial login IDs/identifiers.
+
+INITIAL PASSWORDS
+
+Each account has an initial password corresponding to its user number:
+
+user1.hostelx.in → password: user1
+user2.hostelx.in → password: user2
+user3.hostelx.in → password: user3
+...
+user50.hostelx.in → password: user50
+
+Therefore:
+
+Account 1:
+Login ID: user1.hostelx.in
+Initial password: user1
+Role: ADMIN / OWNER
+Owner name: Kartik
+
+Account 2:
+Login ID: user2.hostelx.in
+Initial password: user2
+Role: USER
+
+Account 3:
+Login ID: user3.hostelx.in
+Initial password: user3
+Role: USER
+
+Continue the same pattern up to:
+
+Account 50:
+Login ID: user50.hostelx.in
+Initial password: user50
+Role: USER
+
+
+FIRST LOGIN FLOW
+
+When a user logs in for the first time using their predefined account and initial password, do NOT immediately show the chat interface.
+
+Instead, show a "Create Your Profile" / "First-Time Setup" screen.
+
+Ask the user to provide:
+
+- Display name
+- Profile photo (optional)
+- About/bio (optional)
+
+After completing the first-time setup, save the user's profile.
+
+The display name becomes the user's public identity inside Kartik Chat.
+
+
+USER ID / DISPLAY ID
+
+After the user chooses their name, generate their application identity using the chosen name.
+
+Example:
+
+Initial account:
+user2.hostelx.in
+
+User enters:
+
+Name: Prince
+
+Their application identity can then be displayed as:
+
+prince.hostelx.in
+
+Another example:
+
+Initial account:
+user3.hostelx.in
+
+User enters:
+
+Name: Ankit
+
+Application identity:
+
+ankit.hostelx.in
+
+IMPORTANT:
+
+The original account ID must remain permanently associated with the user internally.
+
+Do NOT actually rename/delete the original database account.
+
+Instead maintain two separate values:
+
+internal_account_id:
+user2
+
+display_name:
+Prince
+
+display_id:
+prince.hostelx.in
+
+This prevents account conflicts and allows the Owner/Admin to always identify the original account.
+
+
+DISPLAY ID RULES
+
+The display ID should be generated safely from the user's chosen name.
+
+Examples:
+
+"Kartik" → kartik.hostelx.in
+"Prince" → prince.hostelx.in
+"Ankit Kumar" → ankitkumar.hostelx.in
+
+If the requested display ID already exists, automatically provide an available alternative.
+
+Example:
+
+kartik.hostelx.in
+
+already exists.
+
+Possible alternatives:
+
+kartik2.hostelx.in
+kartik_2.hostelx.in
+
+The system must prevent duplicate display IDs.
+
+
+ADMIN ACCOUNT
+
+The first predefined account is the Owner/Admin:
+
+Internal account:
+user1
+
+Initial login:
+user1.hostelx.in
+
+Initial password:
+user1
+
+Owner:
+Kartik
+
+After Kartik completes first-time setup, his display identity can become:
+
+kartik.hostelx.in
+
+Kartik has access to the complete Admin Dashboard.
+
+
+ADMIN CONTROL
+
+Only the first account / Owner account should have Owner/Admin privileges unless the Owner explicitly grants additional administrator permissions.
+
+The Admin can see both:
+
+Original Account:
+user2
+
+Display Identity:
+prince.hostelx.in
+
+Display Name:
+Prince
+
+This allows the Admin to manage users even after they create their personal display identity.
+
+
+NORMAL USER ACCESS
+
+Users 2–50 are normal users by default.
+
+They can:
+
+- Login
+- Complete first-time profile setup
+- Chat with permitted users
+- Access assigned groups
+- Change permitted profile information
+- Send messages
+- Receive messages
+- Use allowed chat features
+
+They cannot:
+
+- Create groups
+- Add arbitrary members
+- Invite new users
+- Create new accounts
+- Access Admin Dashboard
+- Change other users' permissions
+- Change the maximum user limit
+
+
+LOGIN FLOW
+
+STEP 1
+
+User opens:
+
+Kartik Chat Login
+
+STEP 2
+
+User enters:
+
+Login ID:
+userX.hostelx.in
+
+Password:
+userX
+
+STEP 3
+
+System verifies the predefined account.
+
+STEP 4
+
+If this is the first login:
+
+Show:
+
+"Welcome to Kartik Chat"
+
+"Create your profile to continue."
+
+STEP 5
+
+User enters their name.
+
+STEP 6
+
+System generates their display identity.
+
+Example:
+
+user5.hostelx.in
++
+Name: Shani
+
+↓
+
+shani.hostelx.in
+
+STEP 7
+
+Save the profile.
+
+STEP 8
+
+Open the main Kartik Chat interface.
+
+FUTURE LOGIN
+
+On future logins, the user still authenticates using their original secure account credentials.
+
+Example:
+
+Login:
+user5.hostelx.in
+
+Password:
+[their current password]
+
+After authentication, the system loads:
+
+Name: Shani
+Display ID: shani.hostelx.in
+
+The user should not have to repeat the first-time profile setup.
+
+IMPORTANT SECURITY NOTE
+
+Do not use the initial passwords as permanent production passwords.
+
+The user should be encouraged or required to change the initial password during first-time setup.
+
+Passwords must be securely hashed in the backend.
+
+Never store plaintext passwords in the database.
+
+The Admin should be able to reset an account's password through the Admin Dashboard.
+```
+
+### The account structure would therefore look like this
+
+| Internal account | Initial login     | Initial password | Default role       | After profile setup    |
+| ---------------- | ----------------- | ---------------- | ------------------ | ---------------------- |
+| user1            | user1.hostelx.in  | user1            | **Admin – Kartik** | kartik.hostelx.in      |
+| user2            | user2.hostelx.in  | user2            | User               | e.g. prince.hostelx.in |
+| user3            | user3.hostelx.in  | user3            | User               | e.g. ankit.hostelx.in  |
+| user4            | user4.hostelx.in  | user4            | User               | User's chosen name     |
+| ...              | ...               | ...              | ...                | ...                    |
+| user50           | user50.hostelx.in | user50           | User               | User's chosen name     |
+
+**One important improvement:** don't actually change `user2.hostelx.in` into `prince.hostelx.in` in the database. Keep `user2` as the permanent internal account and use `prince.hostelx.in` as the user's **display identity**. That makes your Admin system much safer and prevents account conflicts.

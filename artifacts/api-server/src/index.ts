@@ -1,4 +1,5 @@
 import app from "./app";
+import { ensureSeedAccounts } from "./lib/hostelx-seed";
 import { logger } from "./lib/logger";
 
 const rawPort = process.env["PORT"];
@@ -15,11 +16,13 @@ if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-app.listen(port, (err) => {
-  if (err) {
-    logger.error({ err }, "Error listening on port");
+void ensureSeedAccounts()
+  .then(() => {
+    app.listen(port, () => {
+      logger.info({ port }, "Server listening");
+    });
+  })
+  .catch((err: unknown) => {
+    logger.error({ err }, "Could not initialize HostelX accounts");
     process.exit(1);
-  }
-
-  logger.info({ port }, "Server listening");
-});
+  });

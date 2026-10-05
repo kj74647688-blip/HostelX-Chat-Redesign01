@@ -1,0 +1,210 @@
+ADMIN-CONTROLLED CHAT CREATION
+
+The chatting system must be completely controlled by the Owner/Admin.
+
+ONLY THE ADMIN CAN CREATE A NEW CHAT.
+
+Normal users must NOT have a "Create Group", "Create Chat", or "Add Members" option.
+
+When the Admin wants to create a chat, the Admin should:
+
+1. Click "Create New Chat".
+2. Enter the chat/group name.
+3. Optionally upload a chat/group photo.
+4. See the complete list of registered users.
+5. Select exactly which users should be members.
+6. Confirm the selected members.
+7. Create the chat.
+
+Example:
+
+Admin: Kartik
+
+Registered users:
+
+- user1 → Kartik
+- user2 → Prince
+- user3 → Ankit
+- user4 → Shani
+- user5 → Vivek
+- user6 → Nitin
+- etc.
+
+Kartik creates:
+
+"Hostel Friends"
+
+Members selected by Kartik:
+
+✓ Kartik
+✓ Prince
+✓ Ankit
+✓ Shani
+
+Not selected:
+
+✗ Vivek
+✗ Nitin
+✗ Other users
+
+Only the selected members can see and access "Hostel Friends".
+
+
+CHAT VISIBILITY
+
+A user must ONLY see chats to which the Admin has assigned them.
+
+For example:
+
+Chat A:
+Kartik + Prince + Ankit
+
+Chat B:
+Kartik + Shani + Nitin
+
+Chat C:
+Kartik + Prince + Shani + Vivek
+
+Prince should see:
+
+- Chat A
+- Chat C
+
+Prince must NOT see:
+
+- Chat B
+
+Shani should see:
+
+- Chat B
+- Chat C
+
+Shani must NOT see:
+
+- Chat A
+
+The frontend and backend must both enforce this.
+
+
+PRIVATE ONE-TO-ONE CHATS
+
+If one-to-one private chats are enabled, the same Admin-controlled rule applies.
+
+The Admin can select:
+
+Kartik + Prince
+
+and create/enable a private conversation for them.
+
+If the Admin has not authorized a conversation between two users, those users should not be able to create that conversation themselves.
+
+
+MEMBER MANAGEMENT
+
+ONLY THE ADMIN can:
+
+- Add members
+- Remove members
+- Create chats
+- Delete chats
+- Rename chats
+- Change chat/group photo
+- Change chat permissions
+- Decide who can access a chat
+
+Normal users cannot:
+
+- Create chats
+- Create groups
+- Add users
+- Invite users
+- Remove members
+- Change group membership
+- Make themselves a member of another chat
+
+
+ADMIN CHAT MANAGEMENT PANEL
+
+Create an Admin section called:
+
+"Chat Management"
+
+It should display:
+
+CHAT LIST
+├── Chat name
+├── Chat type
+├── Number of members
+├── Created date
+├── Members
+└── Actions
+
+Actions:
+
+- Create Chat
+- View Chat
+- Edit Chat
+- Add Members
+- Remove Members
+- Rename Chat
+- Change Photo
+- Archive Chat
+- Delete Chat
+
+CREATE CHAT SCREEN
+
+Fields:
+
+Chat Name:
+[________________]
+
+Chat Photo:
+[Upload]
+
+Select Members:
+
+☐ Kartik
+☐ Prince
+☐ Ankit
+☐ Shani
+☐ Vivek
+☐ Nitin
+...
+☐ User 50
+
+[Create Chat]
+
+
+IMPORTANT SECURITY RULE
+
+Do not rely only on hiding buttons from normal users.
+
+The backend/database authorization must reject unauthorized requests.
+
+If a normal user attempts to:
+
+- create a chat
+- add a member
+- remove a member
+- access an unauthorized chat
+
+the server must reject the request.
+
+Therefore, chat membership is controlled by the Admin at the database/backend level, not just by the frontend UI.
+
+
+CORE RULE
+
+Kartik/Admin decides:
+
+WHO CAN USE KARTIK CHAT
+        ↓
+WHO CAN CHAT
+        ↓
+WHICH CHAT THEY CAN SEE
+        ↓
+WHO IS IN EACH CHAT
+        ↓
+WHO CAN BE ADDED OR REMOVED
+
+Normal users only participate in the chats assigned to them.
