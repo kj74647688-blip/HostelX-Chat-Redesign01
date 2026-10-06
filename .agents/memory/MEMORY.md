@@ -1,0 +1,1 @@
+- [HostelX sign-in IDs](hostelx-login-identifiers.md) — after setup, both the permanent account ID and name-based display ID are valid sign-in names.
