@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, ne, or } from "drizzle-orm";
 import { Router, type IRouter } from "express";
 import {
   CompleteFirstLoginSetupBody,
@@ -41,7 +41,8 @@ const failedLoginAttempts = new Map<
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
 const MAX_FAILED_ATTEMPTS = 8;
 const DUMMY_HASH = hashPassword(randomBytes(32).toString("hex"));
-const validLoginId = /^user(?:[1-9]|[1-4][0-9]|50)\.hostelx\.in$/;
+const validAccountLoginId = /^user(?:[1-9]|[1-4][0-9]|50)\.hostelx\.in$/;
+const validDisplayLoginId = /^[a-z0-9]+\.hostelx\.in$/;
 
 function userResponse(user: HostelxUser) {
   return {
@@ -70,7 +71,8 @@ async function findAvailableDisplayId(
   displayName: string,
   userId: string,
 ): Promise<string> {
-  const base = formatDisplayId(displayName);
+  // Leave enough room for the domain and collision suffix in the login field.
+  const base = formatDisplayId(displayName).slice(0, 50);
   for (let suffix = 1; suffix <= 1000; suffix += 1) {
     const candidate = `${base}${suffix === 1 ? "" : suffix}.hostelx.in`;
     const [existing] = await db
@@ -78,8 +80,11 @@ async function findAvailableDisplayId(
       .from(usersTable)
       .where(
         and(
-          eq(usersTable.displayId, candidate),
           ne(usersTable.id, userId),
+          or(
+            eq(usersTable.displayId, candidate),
+            eq(usersTable.loginId, candidate),
+          ),
         ),
       )
       .limit(1);
@@ -122,29 +127,40 @@ router.post("/auth/login", async (request, response) => {
     response.status(400).json({ error: "Password must be 128 characters or fewer." });
     return;
   }
-  if (!validLoginId.test(loginId)) {
+  if (
+    !validAccountLoginId.test(loginId) &&
+    !validDisplayLoginId.test(loginId)
+  ) {
     verifyPassword(parsed.data.password, DUMMY_HASH);
     response.status(401).json({ error: "Login ID or password is incorrect." });
-    return;
-  }
-
-  if (tooManyAttempts(loginId)) {
-    response.status(429).json({ error: "Too many attempts. Try again later." });
     return;
   }
 
   const [user] = await db
     .select()
     .from(usersTable)
-    .where(eq(usersTable.loginId, loginId))
+    .where(
+      validAccountLoginId.test(loginId)
+        ? eq(usersTable.loginId, loginId)
+        : or(
+            eq(usersTable.displayId, loginId),
+            eq(usersTable.loginId, loginId),
+          ),
+    )
     .limit(1);
+  const rateLimitKey = user?.loginId ?? loginId;
+  if (tooManyAttempts(rateLimitKey)) {
+    response.status(429).json({ error: "Too many attempts. Try again later." });
+    return;
+  }
+
   const passwordMatches = verifyPassword(
     parsed.data.password,
     user?.passwordHash ?? DUMMY_HASH,
   );
   if (!user || !passwordMatches) {
-    recordFailedAttempt(loginId);
-    if (tooManyAttempts(loginId)) {
+    recordFailedAttempt(rateLimitKey);
+    if (tooManyAttempts(rateLimitKey)) {
       response.status(429).json({ error: "Too many attempts. Try again later." });
       return;
     }
@@ -153,6 +169,7 @@ router.post("/auth/login", async (request, response) => {
   }
 
   failedLoginAttempts.delete(loginId);
+  failedLoginAttempts.delete(rateLimitKey);
   await createSession(user.id, response);
   response.json(LoginResponse.parse({ user: userResponse(user) }));
 });

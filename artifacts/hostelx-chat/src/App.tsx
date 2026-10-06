@@ -432,7 +432,7 @@ function AppContent() {
       {failure && <div className="form-error" role="alert" data-testid="status-login-error"><AlertCircle size={16}/>{failure}</div>}
       {sessionOffline && <div className="form-error" role="alert" data-testid="status-session-error"><AlertCircle size={16}/><span>HostelX is having trouble connecting. {errorText(sessionQuery.error)}</span><button className="icon-button" type="button" aria-label="Retry connection" onClick={() => void sessionQuery.refetch()} data-testid="button-retry-session"><RefreshCw size={14}/></button></div>}
       <label className="field-label" htmlFor="login-id">Account ID</label>
-      <input className="field-input" id="login-id" data-testid="input-login-id" autoComplete="username" placeholder="user1.hostelx.in" value={loginId} onChange={(event) => setLoginId(event.target.value)} required />
+      <input className="field-input" id="login-id" data-testid="input-login-id" autoComplete="username" placeholder="user1.hostelx.in or your display ID" value={loginId} onChange={(event) => setLoginId(event.target.value)} required />
       <label className="field-label" htmlFor="login-password">Password</label>
       <input className="field-input" id="login-password" data-testid="input-login-password" autoComplete="current-password" type="password" placeholder="Your HostelX password" value={password} onChange={(event) => setPassword(event.target.value)} required />
       <button className="primary-btn login-submit" data-testid="button-sign-in" type="submit" disabled={loginSubmitting}>{loginSubmitting ? <LoaderCircle className="spin" size={16}/> : null} Sign in <ChevronRight size={16}/></button>
@@ -582,7 +582,7 @@ function AppContent() {
       <label className="field-label" htmlFor="setup-about">A little about you <span className="optional-label">Optional</span></label><textarea id="setup-about" className="field-input profile-about" maxLength={240} value={about} onChange={(event) => setAbout(event.target.value)} placeholder="Anything your housemates should know" data-testid="input-setup-about"/>
       <label className="field-label" htmlFor="setup-photo">Profile photo <span className="optional-label">Optional</span></label><input id="setup-photo" className="file-input" type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={(event) => setProfileFile(event.target.files?.[0] ?? null)} data-testid="input-setup-photo"/><label className="upload-picker" htmlFor="setup-photo"><ImagePlus size={16}/><span>{profileFile?.name ?? 'Add a profile photo'}</span></label>
       <button className="primary-btn setup-submit" type="submit" disabled={completeSetup.isPending || busyUpload} data-testid="button-complete-setup">{completeSetup.isPending || busyUpload ? <LoaderCircle className="spin" size={16}/> : <Check size={16}/>} Set up my account</button>
-      <p className="setup-footnote"><LockKeyhole size={13}/> Your login ID never changes. Passwords are managed by HostelX.</p>
+      <p className="setup-footnote"><LockKeyhole size={13}/> After setup, sign in with either your permanent account ID or your new display ID.</p>
     </form></div>}
   </main>;
 }
