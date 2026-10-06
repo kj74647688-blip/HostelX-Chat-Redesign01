@@ -1,1 +1,2 @@
 - [HostelX sign-in IDs](hostelx-login-identifiers.md) — after setup, both the permanent account ID and name-based display ID are valid sign-in names.
+- [HostelX full resets](hostelx-full-reset.md) — clear every profile, including the Owner name, while preserving account IDs, roles, and chats/messages.
